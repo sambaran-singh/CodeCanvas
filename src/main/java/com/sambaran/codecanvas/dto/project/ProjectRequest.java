@@ -1,9 +1,12 @@
 package com.sambaran.codecanvas.dto.project;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
+
 /**
  * @author Sambaran
  */
 public record ProjectRequest(
-        String name
+        @NotBlank String name
 ) {
 }

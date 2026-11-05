@@ -6,12 +6,11 @@ import com.sambaran.codecanvas.dto.auth.SignUpRequest;
 import com.sambaran.codecanvas.dto.auth.UserProfileResponse;
 import com.sambaran.codecanvas.service.AuthService;
 import com.sambaran.codecanvas.service.UserService;
+import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * @author Sambaran
@@ -20,16 +19,17 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/auth")
+@FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
 public class AuthController {
-    private AuthService authService;
-    private UserService userService;
+     AuthService authService;
+     UserService userService;
     @PostMapping("/signup")
-    public ResponseEntity<AuthResponse> signup(SignUpRequest request){
+    public ResponseEntity<AuthResponse> signup(@RequestBody SignUpRequest request){
         return ResponseEntity.ok(authService.signup(request));
     }
 
     @PostMapping("/login")
-    public ResponseEntity<AuthResponse> login(LoginRequest request){
+    public ResponseEntity<AuthResponse> login(@RequestBody LoginRequest request){
         return ResponseEntity.ok(authService.login(request));
     }
 

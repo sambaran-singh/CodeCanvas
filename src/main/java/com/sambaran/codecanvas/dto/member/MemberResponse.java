@@ -9,10 +9,9 @@ import java.time.Instant;
  */
 public record MemberResponse(
         Long id,
-     String email,
+     String username,
      String name,
-     String avatarUrl,
-    ProjectRole role,
+    ProjectRole projectRole,
     Instant invitedAt
 ) {
 }
