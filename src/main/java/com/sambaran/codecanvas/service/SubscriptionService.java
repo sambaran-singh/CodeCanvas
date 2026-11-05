@@ -1,8 +1,5 @@
 package com.sambaran.codecanvas.service;
 
-import com.sambaran.codecanvas.dto.subscription.CheckoutRequest;
-import com.sambaran.codecanvas.dto.subscription.CheckoutResponse;
-import com.sambaran.codecanvas.dto.subscription.PortalResponse;
 import com.sambaran.codecanvas.dto.subscription.SubscriptionResponse;
 import com.sambaran.codecanvas.enums.SubscriptionStatus;
 
@@ -15,13 +12,15 @@ public interface SubscriptionService {
     SubscriptionResponse getCurrentSubscription();
 
 
-    void activateSubscription(Long userId, Long planId, String subscriptionId, String customerId);
+    void activateSubscription(Long userId, Long planId, String gatewaySubscriptionId, String customerId);
 
-    void updateSubscription(String subscriptionId, SubscriptionStatus status, Instant periodStart, Instant periodEnd, Boolean cancelAtPeriodEnd, Long planId);
+    void updateSubscription(String gatewaySubscriptionId, SubscriptionStatus status, Instant periodStart, Instant periodEnd, Boolean cancelAtPeriodEnd, Long planId);
 
-    void cancelSubscription(String subscriptionId);
+    void cancelSubscription(String gatewaySubscriptionId);
 
-    void renewSubscriptionPeriod(String subId, Instant periodStart, Instant periodEnd);
+    void renewSubscriptionPeriod(String gatewaySubscriptionId, Instant periodStart, Instant periodEnd);
 
-    void markSubscriptionPastDue(String subId);
+    void markSubscriptionPastDue(String gatewaySubscriptionId);
+
+    boolean canCreateNewProject();
 }

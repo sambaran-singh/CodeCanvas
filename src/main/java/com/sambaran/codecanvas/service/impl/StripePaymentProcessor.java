@@ -6,6 +6,7 @@ import com.sambaran.codecanvas.dto.subscription.PortalResponse;
 import com.sambaran.codecanvas.entity.Plan;
 import com.sambaran.codecanvas.entity.User;
 import com.sambaran.codecanvas.enums.SubscriptionStatus;
+import com.sambaran.codecanvas.error.BadRequestException;
 import com.sambaran.codecanvas.error.ResourceNotFoundException;
 import com.sambaran.codecanvas.repository.PlanRepository;
 import com.sambaran.codecanvas.repository.UserRepository;
@@ -92,7 +93,25 @@ public class StripePaymentProcessor implements PaymentProcessor {
 
     @Override
     public PortalResponse openCustomerPortal() {
-        return null;
+        Long userId = authUtil.getCurrentUserId();
+        User user = getUser(userId);
+        String stripeCustomerId = user.getStripeCustomerId();
+
+        if(stripeCustomerId == null || stripeCustomerId.isEmpty()){
+            throw new BadRequestException("User doesn't not have Stripe Customer Id, User Id: "+ userId);
+        }
+
+        try {
+            var portalSession = stripeClient.v1().billingPortal().sessions().create(
+                    com.stripe.param.billingportal.SessionCreateParams.builder()
+                            .setCustomer(stripeCustomerId)
+                            .setReturnUrl(frontEndUrl)
+                            .build()
+            );
+            return new PortalResponse(portalSession.getUrl());
+        }catch (StripeException e){
+            throw new RuntimeException(e);
+        }
     }
     @Override
     public void handleWebhookEvent(String type, StripeObject stripeObject, Map<String, String> metadata) {
@@ -123,7 +142,7 @@ public class StripePaymentProcessor implements PaymentProcessor {
 
         User user = getUser(userId);
 
-        if(user.getStripeCustomerId() != null){
+        if(user.getStripeCustomerId() == null){
             user.setStripeCustomerId(customerId);
             userRepository.save(user);
         }

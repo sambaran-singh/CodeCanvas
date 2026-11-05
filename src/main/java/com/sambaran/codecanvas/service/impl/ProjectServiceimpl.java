@@ -8,6 +8,7 @@ import com.sambaran.codecanvas.entity.ProjectMember;
 import com.sambaran.codecanvas.entity.ProjectMemberId;
 import com.sambaran.codecanvas.entity.User;
 import com.sambaran.codecanvas.enums.ProjectRole;
+import com.sambaran.codecanvas.error.BadRequestException;
 import com.sambaran.codecanvas.error.ResourceNotFoundException;
 import com.sambaran.codecanvas.mapper.ProjectMapper;
 import com.sambaran.codecanvas.repository.ProjectMemberRepository;
@@ -15,6 +16,7 @@ import com.sambaran.codecanvas.repository.ProjectRepository;
 import com.sambaran.codecanvas.repository.UserRepository;
 import com.sambaran.codecanvas.security.AuthUtil;
 import com.sambaran.codecanvas.service.ProjectService;
+import com.sambaran.codecanvas.service.SubscriptionService;
 import jakarta.transaction.Transactional;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -39,8 +41,13 @@ public class ProjectServiceimpl implements ProjectService {
     ProjectMapper projectMapper;
     ProjectMemberRepository projectMemberRepository;
     AuthUtil authUtil;
+    SubscriptionService subscriptionService;
+
     @Override
     public ProjectResponse createProject(ProjectRequest request) {
+        if(!subscriptionService.canCreateNewProject()){
+            throw new BadRequestException("User can't create new project with current plan.Upgrage Plan now !!!");
+        }
         Long userId = authUtil.getCurrentUserId();
 //        User owner = userRepository.findById(userId).orElseThrow(
 //                ()->new ResourceNotFoundException("User",userId.toString())
