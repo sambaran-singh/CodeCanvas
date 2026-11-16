@@ -6,6 +6,8 @@ import com.sambaran.codecanvas.repository.ProjectMemberRepository;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.stereotype.Component;
 
 /**
@@ -14,6 +16,7 @@ import org.springframework.stereotype.Component;
 @Component("security")
 @RequiredArgsConstructor
 @FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
+@Slf4j
 public class SecurityExpression {
 
     ProjectMemberRepository projectMemberRepository;
@@ -31,6 +34,7 @@ public class SecurityExpression {
     }
 
     public boolean canEditProject(Long projectId){
+        log.info("Code reached here");
         return hasPermission(projectId, ProjectPermission.EDIT);
     }
 
