@@ -16,6 +16,7 @@ import com.sambaran.codecanvas.repository.ProjectRepository;
 import com.sambaran.codecanvas.repository.UserRepository;
 import com.sambaran.codecanvas.security.AuthUtil;
 import com.sambaran.codecanvas.service.ProjectService;
+import com.sambaran.codecanvas.service.ProjectTemplateService;
 import com.sambaran.codecanvas.service.SubscriptionService;
 import jakarta.transaction.Transactional;
 import lombok.AccessLevel;
@@ -42,6 +43,7 @@ public class ProjectServiceimpl implements ProjectService {
     ProjectMemberRepository projectMemberRepository;
     AuthUtil authUtil;
     SubscriptionService subscriptionService;
+    ProjectTemplateService projectTemplateService;
 
     @Override
     public ProjectResponse createProject(ProjectRequest request) {
@@ -71,6 +73,7 @@ public class ProjectServiceimpl implements ProjectService {
                 .build();
 
         projectMemberRepository.save(projectMember);
+        projectTemplateService.initializeProjectFromTemplate(project.getId());
         return projectMapper.toProjectResponse(project);
     }
     @Override

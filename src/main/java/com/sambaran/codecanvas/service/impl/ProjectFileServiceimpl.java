@@ -9,6 +9,7 @@ import com.sambaran.codecanvas.mapper.ProjectFileMapper;
 import com.sambaran.codecanvas.repository.ProjectFileRepository;
 import com.sambaran.codecanvas.repository.ProjectRepository;
 import com.sambaran.codecanvas.service.ProjectFileService;
+import io.minio.GetObjectArgs;
 import io.minio.MinioClient;
 import io.minio.PutObjectArgs;
 import lombok.RequiredArgsConstructor;
@@ -33,21 +34,36 @@ public class ProjectFileServiceimpl implements ProjectFileService {
     private final ProjectFileRepository projectFileRepository;
     private final MinioClient minioClient;
     private final ProjectFileMapper projectFileMapper;
+    private static final String BUCKET_NAME = "projects";
     @Value("${minio.project-bucket}")
     private String projectBucket;
 
 
     @Override
-    public List<FileNode> getFileTree(Long projectId, Long userId) {
+    public List<FileNode> getFileTree(Long projectId) {
 
         List<ProjectFile> projectFiles = projectFileRepository.findByProjectId(projectId);
         return projectFileMapper.toListOfFileNode(projectFiles);
-        
+
     }
 
     @Override
-    public FileContentResponse getFileContent(Long projectId, String path, Long userId) {
-        return null;
+    public FileContentResponse getFileContent(Long projectId, String path) {
+
+        String objectName = projectId + "/" + path;
+        try (
+                InputStream is = minioClient.getObject(
+                        GetObjectArgs.builder()
+                                .bucket(BUCKET_NAME)
+                                .object(objectName)
+                                .build())) {
+
+            String content = new String(is.readAllBytes(), StandardCharsets.UTF_8);
+            return new FileContentResponse(path, content);
+        } catch (Exception e) {
+            log.error("Failed to read file: {}/{}", projectId, path, e);
+            throw new RuntimeException("Failed to read file content", e);
+        }
     }
 
     @Override
